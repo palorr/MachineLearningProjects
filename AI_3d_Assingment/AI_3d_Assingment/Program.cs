@@ -10,7 +10,10 @@ namespace AI_3d_Assingment
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("hey there !!! ");
+            string filePath = @"C:\Users\archo\Desktop\MachineLearningProjects\AI_3d_Assingment\AI_3d_Assingment\Test Data\test.dat"; 
+            string text = System.IO.File.ReadAllText(filePath);
+            //string text = System.IO.File.ReadAllText(@"C:\Users\archo\Desktop\MachineLearningProjects\AI_3d_Assingment\AI_3d_Assingment\Test Data\test.dat");
+            Console.WriteLine(text);
         }
     }
 }
