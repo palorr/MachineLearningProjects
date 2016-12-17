@@ -49,7 +49,7 @@ namespace AI_3d_Assingment
             }
         }
 
-        //reads the file an prepare the our matrix data 
+        //reads the file an prepare our matrix data 
         public void prepare(String @filePath, int percentage)
         {
             Console.WriteLine(System.IO.File.Exists(filePath) ? "File exists." : "File does not exist.");
@@ -134,9 +134,9 @@ namespace AI_3d_Assingment
             dataReturn.cols = headersReturn.Count;
             dataReturn.Attrs = headersReturn;
 
-            for (attrIndex = 0; attrIndex < Attrs.Count; attrIndex++)
+            for (attrIndex = 0; attrIndex < dataReturn.Attrs.Count; attrIndex++)
             {
-                if (attrName.Equals(Attrs[attrIndex]))
+                if (attrName.Equals(dataReturn.Attrs[attrIndex]))
                     break;
             }
 
@@ -162,7 +162,6 @@ namespace AI_3d_Assingment
             dataReturn.rowsNum = rowsReturn.Count;
             return dataReturn;
         }
-
-
+        
     }
 }

@@ -16,8 +16,10 @@ namespace AI_3d_Assingment
 
             Data testData = new Data();
             testData.prepare(filePath, 100);
-            testData.print();
+            //testData.print();
 
+            testData.split("attr1",0);
+            testData.print();
         }
     }
 }
