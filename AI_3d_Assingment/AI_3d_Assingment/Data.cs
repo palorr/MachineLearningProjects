@@ -9,10 +9,10 @@ namespace AI_3d_Assingment
     class Data
     {
         //matrix implementation
-        int cols { get; set; }
-        List<String> Attrs { get; set; }
+        public int cols { get; set; }
+        public List<String> Attrs { get; set; }
         List<int[]> rows { get; set; }
-        int rowsNum { get; set; }
+        public int rowsNum { get; set; }
 
         //ctor
         public Data()
