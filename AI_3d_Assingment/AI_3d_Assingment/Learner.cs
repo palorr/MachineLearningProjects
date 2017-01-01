@@ -52,13 +52,56 @@ namespace AI_3d_Assingment
         //his function generates a decision tree recursively
         public void learnTree(Dictionary<string , int[]> setTrainingVector, int[] finalClass, TreeNode node, Data data)
         {
-            if(checkFinalClass(finalClass, 0))//todo
+            if (checkFinalClass(finalClass, 0))//todo
             {
                 node.result = 0;
-                return; 
+                return;
+            }
+            else if (checkFinalClass(finalClass, 1))
+            {
+                node.result = 1;
+                return;
             }
 
+            if (setTrainingVector.Count == 1)//not sure 
+            {
+                int pos = getCountPositives(finalClass);//todo
+                int neg = finalClass.Length - pos;
 
+                if(pos >= neg)
+                {
+                    node.result = 0;
+                    return;
+                }
+                else
+                {
+                    node.result = 1;
+                    return;
+                }
+            }
+            else
+            {
+                Dictionary<String, Double> attributesGains = new Dictionary<String, Double>();
+                Dictionary<String, List<int>> mapAttributesValuesInListUnique = new Dictionary<String, List<int>>();
+
+                double entropyS = getEntropy(finalClass);// initial entropy // todo
+
+                foreach (KeyValuePair<string,  int[]> entry in setTrainingVector)//not sure
+                {
+                    // do something with entry.Value or entry.Key
+
+                    Dictionary<int, int> atrPositive = new Dictionary<int, int>();
+                    Dictionary<int, int> atrNegative = new Dictionary<int, int>();
+                    List<int> atrUnique = new List<int>();
+
+                    int[] trainingClass = (int[])entry.Value;
+
+                }
+
+
+
+
+            }
         }
 
     }
