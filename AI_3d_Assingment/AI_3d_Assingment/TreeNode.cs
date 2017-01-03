@@ -9,10 +9,10 @@ namespace AI_3d_Assingment
     class TreeNode
     {
         public int attrValue { get; set; }
-        string attrName { get; set; }
-        List<TreeNode> children { get; set; }
+        public string attrName { get; set; }
+        public List<TreeNode> children { get; set; }
         public int result { get; set; }   // the result attribute value (-1 if not leaf node)
-        double gain { get; set; }
+        public double gain { get; set; }
 
         //ctor default
         public TreeNode()
