@@ -17,7 +17,7 @@ namespace AI_3d_Assingment
             this.percentage = percentage;
         }
 
-        // lets start learning
+        // lets start learning and create the root node 
         public TreeNode start()
         {
             if (filename == null)
@@ -30,19 +30,20 @@ namespace AI_3d_Assingment
             }
 
             Data data = new Data();
-            data.prepare(filename, percentage);
+            data.prepare(filename, percentage); // Data prepare method
 
             Dictionary<string, int[]> setTrainingVector = new Dictionary<string, int[]>();
-
+            
+            //in this for we fill the setTrainingVector with the data 
             for (int i = 0; i < data.cols - 1; i++)
             {
                 int[] trainingVector = new int[data.rowsNum];
                 data.fillArray(trainingVector, i);
-                setTrainingVector.Add(data.Attrs[i], trainingVector);
-            }
+                setTrainingVector.Add(data.Attrs[i], trainingVector);//key,value
+            } 
 
             int[] finalClass = new int[data.rowsNum];
-            data.fillArray(finalClass, data.cols - 1);
+            data.fillArray(finalClass, data.cols - 1);  //all perfect until here 
 
             TreeNode rootNode = new TreeNode();
             rootNode.attrValue = -1;
@@ -52,22 +53,22 @@ namespace AI_3d_Assingment
         }
         
         //this function generates a decision tree recursively
-        public void learnTree(Dictionary<string, int[]> setTrainingVector, int[] finalClass, TreeNode node, Data data)
+        public void learnTree(Dictionary<string, int[]> TrainingDictionary, int[] finalClass, TreeNode node, Data data)
         {
-            if (checkFinalClass(finalClass, 0))//todo
+            if (checkFinalClass(finalClass, 0))//check if all values are 0
             {
                 node.result = 0;
                 return;
             }
-            else if (checkFinalClass(finalClass, 1))
+            else if (checkFinalClass(finalClass, 1))//check if all values are 0
             {
                 node.result = 1;
                 return;
             }
 
-            if (setTrainingVector.Count == 1)//not sure 
+            if (TrainingDictionary.Count == 1)
             {
-                int pos = getCountPositives(finalClass);//todo
+                int pos = getCountPositives(finalClass);
                 int neg = finalClass.Length - pos;
 
                 if (pos >= neg)
@@ -86,38 +87,40 @@ namespace AI_3d_Assingment
                 Dictionary<String, Double> attributesGains = new Dictionary<String, Double>();
                 Dictionary<String, List<int>> mapAttributesValuesInListUnique = new Dictionary<String, List<int>>();
 
-                double entropyS = getEntropy(finalClass);// initial entropy // todo
+                double entropy = getEntropy(finalClass);// initial entropy
 
-                foreach (KeyValuePair<string, int[]> entry in setTrainingVector)//not sure
+                foreach (KeyValuePair<string, int[]> pair in TrainingDictionary)//not sure
                 {
-                    // do something with entry.Value or entry.Key
+                    //entry.Value or entry.Key
 
                     Dictionary<int, int> atrPositive = new Dictionary<int, int>();
                     Dictionary<int, int> atrNegative = new Dictionary<int, int>();
                     List<int> atrUnique = new List<int>();
 
-                    int[] trainingClass = (int[])entry.Value;
+                    int[] trainingClass = (int[])pair.Value;//key value pair -> value in trainingClass
 
                     for (int i = 0; i < trainingClass.Length; i++) // find individual entropies
                     {
-                        addOnlyUnique(atrUnique, trainingClass[i]);
+                        addOnlyUnique(atrUnique, trainingClass[i]);  // addOnlyUnique adds a value to the arraylist only if does not exists in the list
 
                         if (finalClass[i] == 0)// its a positive
                         {
                             if (atrPositive.ContainsKey(trainingClass[i]))
                             {
-                                atrPositive.Add(trainingClass[i], atrPositive.get(trainingClass[i]) + 1);
+                                //atrPositive.Add(trainingClass[i], atrPositive[trainingClass[i]] + 1); //the key already exists so cracks
+                                atrPositive[trainingClass[i]]++;   //increase the value by 1 (we love .net <3)
                             }
                             else
                             {
                                 atrPositive.Add(trainingClass[i], 1);
                             }
                         }
-                        else
-                        {// FinalClass is negative
+                        else   //negative
+                        {
                             if (atrNegative.ContainsKey(trainingClass[i]))
                             {
-                                atrNegative.Add(trainingClass[i], atrNegative.get(trainingClass[i]) + 1); // vgale nohma kai des pos tha to kaneis //value = dictionary[key];
+                                //atrNegative.Add(trainingClass[i], atrNegative[trainingClass[i]] + 1); // not fucking sure
+                                atrNegative[trainingClass[i]]++; //increase the value by 1
                             }
                             else
                             {
@@ -128,19 +131,19 @@ namespace AI_3d_Assingment
 
                     }
 
-                    mapAttributesValuesInListUnique.Add((String)entry.Key, atrUnique);
+                    mapAttributesValuesInListUnique.Add((String)pair.Key, atrUnique);
 
                     {//calculate the gain
-                        double gain = entropyS;
+                        double gain = entropy;
                         foreach (int tempAttr in atrUnique)
                         {
                             double entropyTemp = 0.0;
                             int positives = 0;
                             int negatives = 0;
-                            if (atrPositive.get(tempAttr) != null)
-                                positives = atrPositive.get(tempAttr);
-                            if (atrNegative.get(tempAttr) != null)
-                                negatives = atrNegative.get(tempAttr);
+                            if (atrPositive[tempAttr] != null)
+                                positives = atrPositive[tempAttr];
+                            if (atrNegative[tempAttr] != null)
+                                negatives = atrNegative[tempAttr];
 
                             double val1 = (double)(positives) / (positives + negatives);
                             double val2 = (double)(negatives) / (positives + negatives);
@@ -149,18 +152,18 @@ namespace AI_3d_Assingment
                             gain = gain - ((((double)positives + negatives) / trainingClass.Length) * entropyTemp);
                         }
 
-                        attributesGains.Add((String)entry.Key, gain);
+                        attributesGains.Add((String)pair.Key, gain);
                     }
                 }//end foreach
 
-                // now select the maximum gain
+                // now lets select the maximum gain
                 String attributeWithMAxGain = "";
                 double maxGainValue = 0.0;
                 int indexToChoose = 0;
 
-                foreach (KeyValuePair<string, int[]> entry in setTrainingVector)//not sure
+                foreach (KeyValuePair<string, int[]> entry in TrainingDictionary)
                 {
-                    double tempGain = attributesGains.get((String)entry.Key);
+                    double tempGain = attributesGains[(String)entry.Key];
                     if (indexToChoose == 0)
                     {
                         maxGainValue = tempGain;
@@ -178,7 +181,7 @@ namespace AI_3d_Assingment
                 node.gain = maxGainValue;
 
                 // Now we will call this algorithm recursively for how many attributes values of max attribute.
-                List<int> atrUniqueValuesForAttrMaxGain = mapAttributesValuesInListUnique.get(attributeWithMAxGain);
+                List<int> atrUniqueValuesForAttrMaxGain = mapAttributesValuesInListUnique[attributeWithMAxGain];
 
                 foreach (int tempAtrUniqueValue in atrUniqueValuesForAttrMaxGain)
                 {
@@ -187,24 +190,23 @@ namespace AI_3d_Assingment
                     NodeChild.attrValue = tempAtrUniqueValue;// since its a child
                                                               // node
                     node.children.Add(NodeChild);
-                    Data matrixChild = data.split(attributeWithMAxGain, tempAtrUniqueValue);
-                    // matrixChild.printMatrix();
-                    // calling the algorithm
+                    Data child = data.split(attributeWithMAxGain, tempAtrUniqueValue); //outlook , sunny
+
                     Dictionary<String, int[]> setTrainingVectorChild = new Dictionary<String, int[]>();
                     // Now i need a set of R training vectors
-                    for (int i = 0; i < matrixChild.cols - 1; i++)
+                    for (int i = 0; i < child.cols - 1; i++)
                     {
-                        int[] trainingVectorChild = new int[matrixChild.rowsNum];
-                        matrixChild.fillArray(trainingVectorChild, i);
-                        setTrainingVectorChild.Add(matrixChild.Attrs[i], trainingVectorChild);
+                        int[] trainingVectorChild = new int[child.rowsNum];
+                        child.fillArray(trainingVectorChild, i);
+                        setTrainingVectorChild.Add(child.Attrs[i], trainingVectorChild);
                     }
 
                     // i need final class vector
-                    int[] FinalClassChild = new int[matrixChild.rowsNum];
-                    matrixChild
-                            .fillArray(FinalClassChild, matrixChild.cols - 1);
+                    int[] FinalClassChild = new int[child.rowsNum];
+                    child
+                            .fillArray(FinalClassChild, child.cols - 1);
 
-                    learnTree(setTrainingVectorChild, FinalClassChild, NodeChild, matrixChild); //recurse
+                    learnTree(setTrainingVectorChild, FinalClassChild, NodeChild, child); //recurse
 
                 }
 
@@ -245,14 +247,14 @@ namespace AI_3d_Assingment
         }
 
         // Returns entropy calculated for a given set of vector
-        public double getEntropy(int[] vector)
+        public double getEntropy(int[] array)
         {
             double entropy = 0.0;
             int positives = 0;
             int negatives = 0;
-            for (int i = 0; i < vector.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                if (vector[i] == 0)// its a positive
+                if (array[i] == 0)// its a positive
                 {
                     positives++;
                 }

@@ -11,13 +11,13 @@ namespace AI_3d_Assingment
         //matrix implementation
         public int cols { get; set; }
         public List<String> Attrs { get; set; }
-        List<int[]> rows { get; set; }
+        List<int[]> indexOfEachCol { get; set; } //to periexomeno tis kathe sthlhs 
         public int rowsNum { get; set; }
 
         //ctor
         public Data()
         {
-            rows = new List<int[]>();
+            indexOfEachCol = new List<int[]>();
             Attrs = new List<String>();
         }
 
@@ -28,7 +28,7 @@ namespace AI_3d_Assingment
             {
                 Console.Write("\t" + attr);
             }
-            foreach (int[] temp in rows)
+            foreach (int[] temp in indexOfEachCol)
             {
                 Console.WriteLine("");
                 for (int i = 0; i < cols; i++)
@@ -43,7 +43,7 @@ namespace AI_3d_Assingment
         public void fillArray(int[] arrayToFill, int indexToFetch)
         {
             int arrIndex = 0;
-            foreach (int[] temp in rows)
+            foreach (int[] temp in indexOfEachCol)
             {
                 arrayToFill[arrIndex++] = temp[indexToFetch];
             }
@@ -65,7 +65,7 @@ namespace AI_3d_Assingment
                     {
                         Attrs.Add(header);
                     }
-                }
+                }//all perfect until here 
 
                 Attrs.Add("Result");
                 ////////////////////////////////data reader/////////////////////////////////
@@ -91,23 +91,23 @@ namespace AI_3d_Assingment
 
                         }
 
-                        rows.Add(tmpRow);
+                        indexOfEachCol.Add(tmpRow);
                     }
                 }
                 /////////////////////////////calculate percentage/////////////////////////////
                 {
-                    int finalRowsNum = (percentage * rows.Count) / 100;
+                    int finalRowsNum = (percentage * indexOfEachCol.Count) / 100;
 
-                    if (!(finalRowsNum == rows.Count))
+                    if (!(finalRowsNum == indexOfEachCol.Count))
                     {
-                        for (int i = rows.Count - 1; i > finalRowsNum; i--)
+                        for (int i = indexOfEachCol.Count - 1; i > finalRowsNum; i--)
                         {
-                            rows.RemoveAt(i);
+                            indexOfEachCol.RemoveAt(i);
                         }
                     }
                 }
 
-                rowsNum = rows.Count;
+                rowsNum = indexOfEachCol.Count;
 
             }
 
@@ -116,23 +116,20 @@ namespace AI_3d_Assingment
         }
 
         //with this function i remove the col with a spesific attr name
-        public Data split(string attrName, int value)
+        public Data split(string attrName, int value)//outlook , sunny
         {
             Data dataReturn = new Data();
             List<int[]> rowsReturn = new List<int[]>();
-            List<string> headersReturn = new List<string>();
+            List<string> headersToReturn = new List<string>();
             int attrIndex = 0;
-
-            ////////////////////All headers except the selected///////////////////////
 
             foreach (string tmpHeader in Attrs)
             {
-                if (!tmpHeader.Equals(attrName))
-                    headersReturn.Add(tmpHeader);
+                headersToReturn.Add(tmpHeader);
             }
 
-            dataReturn.cols = headersReturn.Count;
-            dataReturn.Attrs = headersReturn;
+            dataReturn.cols = headersToReturn.Count;
+            dataReturn.Attrs = headersToReturn;
 
             for (attrIndex = 0; attrIndex < dataReturn.Attrs.Count; attrIndex++)
             {
@@ -140,11 +137,11 @@ namespace AI_3d_Assingment
                     break;
             }
 
-            foreach (int[] tmpRow in rows)
+            foreach (int[] tmpRow in indexOfEachCol)
             {
                 if (tmpRow[attrIndex] == value)
                 {
-                    int[] tmpCol = new int[headersReturn.Count];
+                    int[] tmpCol = new int[headersToReturn.Count];
                     int indexTmpCol = 0;
                     for (int i = 0; i < cols; i++)
                     {
@@ -158,7 +155,7 @@ namespace AI_3d_Assingment
                 }
             }
 
-            dataReturn.rows = rowsReturn;
+            dataReturn.indexOfEachCol = rowsReturn;
             dataReturn.rowsNum = rowsReturn.Count;
             return dataReturn;
         }
