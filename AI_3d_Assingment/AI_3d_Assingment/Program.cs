@@ -13,39 +13,22 @@ namespace AI_3d_Assingment
             string trainFilePath = @"C:\Users\archo\Desktop\MachineLearningProjects\AI_3d_Assingment\AI_3d_Assingment\Test Data\train.dat";
             string trainText = System.IO.File.ReadAllText(trainFilePath);
 
-            string testFilePath = @"C:\Users\archo\Desktop\MachineLearningProjects\AI_3d_Assingment\AI_3d_Assingment\Test Data\test.dat";
-            string testText = System.IO.File.ReadAllText(testFilePath);
-
-            //Console.WriteLine(testText);
-
-
             int percentToLearnFromTrain = 100;
 
             Learner learner = new Learner(trainFilePath, percentToLearnFromTrain);
-            TreeNode root = learner.start();
+            Node root = learner.start();
+            //root.printTree(root);
 
-            //if (root != null)
-            //{
-            //    root.printTree(root, 0);
+            Dictionary<string, int> testRow = new Dictionary<string, int>();
+            testRow.Add("attr1", 0);
+            testRow.Add("attr2", 1);
+            testRow.Add("attr3", 1);
+            testRow.Add("attr4", 0);
+            testRow.Add("attr5", 1);
+            testRow.Add("attr6", 0);
 
-            //    //{// Calculating the accuracy on Training Set
-            //    //    Data matrixTests = new Data();
-            //    //    matrixTests.prepare(trainFilePath, 100);
-            //    //    // matrixTests.printMatrix();
-            //    //    matrixTests.getTestAccuracy(root, "Training Set");
+            root.ScanAndCalculate(testRow, root); 
 
-            //    //}
-            //    //{// Calculating the accuracy on Test Set
-            //    //    Data matrixTests2 = new Data();
-            //    //    matrixTests2.prepare(testFilePath, 100);
-            //    //    // matrixTests.printMatrix();
-            //    //    matrixTests2.getTestAccuracy(root, "Test Set");
-            //    //}
-            //}
-            //else
-            //{
-            //    Console.WriteLine("failed");
-            //}
 
 
         }

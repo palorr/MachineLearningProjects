@@ -18,7 +18,7 @@ namespace AI_3d_Assingment
         }
 
         // lets start learning and create the root node 
-        public TreeNode start()
+        public Node start()
         {
             if (filename == null)
             {
@@ -33,27 +33,27 @@ namespace AI_3d_Assingment
             data.prepare(filename, percentage); // Data prepare method
 
             Dictionary<string, int[]> setTrainingVector = new Dictionary<string, int[]>();
-            
-            //in this for we fill the setTrainingVector with the data 
+
+            //fill the setTrainingVector with the data 
             for (int i = 0; i < data.cols - 1; i++)
             {
                 int[] trainingVector = new int[data.rowsNum];
                 data.fillArray(trainingVector, i);
                 setTrainingVector.Add(data.Attrs[i], trainingVector);//key,value
-            } 
+            }
 
             int[] finalClass = new int[data.rowsNum];
             data.fillArray(finalClass, data.cols - 1);  //all perfect until here 
 
-            TreeNode rootNode = new TreeNode();
-            rootNode.attrValue = -1;
+            Node rootNode = new Node();
+            rootNode.valueOfPrevNode = -1; //this happens because there is not prev node
 
-            learnTree(setTrainingVector, finalClass, rootNode, data);
+            learnTree(setTrainingVector, finalClass, rootNode, data); //here we call the learnTree
             return rootNode;
         }
-        
-        //this function generates a decision tree recursively
-        public void learnTree(Dictionary<string, int[]> TrainingDictionary, int[] finalClass, TreeNode node, Data data)
+
+        //Generates a decision tree recursively
+        public void learnTree(Dictionary<string, int[]> TrainingDictionary, int[] finalClass, Node node, Data data)
         {
             if (checkFinalClass(finalClass, 0))//check if all values are 0
             {
@@ -91,8 +91,7 @@ namespace AI_3d_Assingment
 
                 foreach (KeyValuePair<string, int[]> pair in TrainingDictionary)//not sure
                 {
-                    //entry.Value or entry.Key
-
+                    
                     Dictionary<int, int> atrPositive = new Dictionary<int, int>();
                     Dictionary<int, int> atrNegative = new Dictionary<int, int>();
                     List<int> atrUnique = new List<int>();
@@ -130,7 +129,7 @@ namespace AI_3d_Assingment
                         }
 
                     }
-
+                    //edw paizei na einai malakia !! san na bainoun dyo kleidia !!!
                     mapAttributesValuesInListUnique.Add((String)pair.Key, atrUnique);
 
                     {//calculate the gain
@@ -140,10 +139,16 @@ namespace AI_3d_Assingment
                             double entropyTemp = 0.0;
                             int positives = 0;
                             int negatives = 0;
-                            if (atrPositive[tempAttr] != null)
+
+                            if (atrPositive.ContainsKey(tempAttr))
                                 positives = atrPositive[tempAttr];
-                            if (atrNegative[tempAttr] != null)
+                            else
+                                positives = 0;
+
+                            if (atrNegative.ContainsKey(tempAttr))
                                 negatives = atrNegative[tempAttr];
+                            else
+                                negatives = 0; 
 
                             double val1 = (double)(positives) / (positives + negatives);
                             double val2 = (double)(negatives) / (positives + negatives);
@@ -180,33 +185,41 @@ namespace AI_3d_Assingment
                 node.result = -1;
                 node.gain = maxGainValue;
 
-                // Now we will call this algorithm recursively for how many attributes values of max attribute.
+                //for each value of each attribute
                 List<int> atrUniqueValuesForAttrMaxGain = mapAttributesValuesInListUnique[attributeWithMAxGain];
 
                 foreach (int tempAtrUniqueValue in atrUniqueValuesForAttrMaxGain)
                 {
-
-                    TreeNode NodeChild = new TreeNode();
-                    NodeChild.attrValue = tempAtrUniqueValue;// since its a child
-                                                              // node
-                    node.children.Add(NodeChild);
-                    Data child = data.split(attributeWithMAxGain, tempAtrUniqueValue); //outlook , sunny
-
-                    Dictionary<String, int[]> setTrainingVectorChild = new Dictionary<String, int[]>();
-                    // Now i need a set of R training vectors
-                    for (int i = 0; i < child.cols - 1; i++)
+                    //split tha data 
+                    Data childData = data.split(attributeWithMAxGain, tempAtrUniqueValue);
+                    
+                    /////////////////////////////////////////
+                    //with this check I avoid the infinity loop in case of non-pure final data
+                    if (finalClass.Length == childData.rowsNum)
                     {
-                        int[] trainingVectorChild = new int[child.rowsNum];
-                        child.fillArray(trainingVectorChild, i);
-                        setTrainingVectorChild.Add(child.Attrs[i], trainingVectorChild);
+                        node.result = calcResultInCaseOfTerminalAndNotPure(finalClass);
+                        return; 
+                    }
+                    /////////////////////////////////////////
+
+                    Node NodeChild = new Node();
+                    NodeChild.valueOfPrevNode = tempAtrUniqueValue;// since its a child
+                                                             
+                    node.children.Add(NodeChild);
+
+                    Dictionary<String, int[]> childTrainingDictionary = new Dictionary<String, int[]>();
+
+                    for (int i = 0; i < childData.cols - 1; i++)
+                    {
+                        int[] trainingVectorChild = new int[childData.rowsNum];
+                        childData.fillArray(trainingVectorChild, i);
+                        childTrainingDictionary.Add(childData.Attrs[i], trainingVectorChild);
                     }
 
-                    // i need final class vector
-                    int[] FinalClassChild = new int[child.rowsNum];
-                    child
-                            .fillArray(FinalClassChild, child.cols - 1);
+                    int[] FinalClassChild = new int[childData.rowsNum];
+                    childData.fillArray(FinalClassChild, childData.cols - 1);//last column is the result
 
-                    learnTree(setTrainingVectorChild, FinalClassChild, NodeChild, child); //recurse
+                    learnTree(childTrainingDictionary, FinalClassChild, NodeChild, childData); //recurse
 
                 }
 
@@ -215,7 +228,7 @@ namespace AI_3d_Assingment
             }//end else
         }
 
-        //log base 2 , need this for entropy 
+        //Log base 2 , need this for entropy 
         public static double log2(double num)
         {
             if (num <= 0)
@@ -224,14 +237,34 @@ namespace AI_3d_Assingment
         }
 
         // If all the attributes in final class equals valueToChecked returns True
-        public bool checkFinalClass(int[] FinalClass, int valueToChecked)
+        public bool checkFinalClass(int[] finalClass, int valueToChecked)
         {
-            for (int i = 0; i < FinalClass.Length; i++)
+            for (int i = 0; i < finalClass.Length; i++)
             {
-                if (FinalClass[i] != valueToChecked)
+                if (finalClass[i] != valueToChecked)
                     return false;
             }
             return true;
+        }
+        
+        //this function is used when we cant calculate a pure result but we are in a leaf node
+        //returns 0 or 1
+        //i have to make it more clever but I need sleep (5/1/2017  4.50 am)
+        public int calcResultInCaseOfTerminalAndNotPure(int[] finalClass)
+        {
+            int sum0 = 0,  sum1 = 0;
+
+            foreach (int cell in finalClass)
+            {
+                if (cell == 0)
+                    sum0++;
+                else
+                    sum1++;
+            }
+            if (sum0 > sum1)
+                return 0;
+            else
+                return 1;
         }
 
         // Returns the count of positives in final class

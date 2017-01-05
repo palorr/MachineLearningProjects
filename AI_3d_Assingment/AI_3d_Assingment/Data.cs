@@ -115,7 +115,7 @@ namespace AI_3d_Assingment
 
         }
 
-        //with this function i remove the col with a spesific attr name
+        //with this function I remove the col with a spesific attr name
         public Data split(string attrName, int value)//outlook , sunny
         {
             Data dataReturn = new Data();
