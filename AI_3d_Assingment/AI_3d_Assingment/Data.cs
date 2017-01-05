@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+/// <summary>
+/// 3130160 Nikolaos Papadogoulas
+/// 3130198 Archontellis-Rafael Sotirchellis
+/// </summary>
 
 namespace AI_3d_Assingment
 {
     class Data
     {
-        //matrix implementation
         public int cols { get; set; }
         public List<String> Attrs { get; set; }
-        List<int[]> indexOfEachCol { get; set; } //to periexomeno tis kathe sthlhs 
+        List<int[]> indexOfEachCol { get; set; }
         public int rowsNum { get; set; }
 
         //ctor
@@ -21,7 +22,7 @@ namespace AI_3d_Assingment
             Attrs = new List<String>();
         }
 
-        //print the data 
+        //Print the data 
         public void print()
         {
             foreach (String attr in Attrs)
@@ -40,16 +41,16 @@ namespace AI_3d_Assingment
         }
 
         //FIlls the given array with values for which index is matched to the given index
-        public void fillArray(int[] arrayToFill, int indexToFetch)
+        public void fillCol(int[] arrayToFill, int indexToFetch)
         {
-            int arrIndex = 0;
-            foreach (int[] temp in indexOfEachCol)
+            int index = 0;
+            foreach (int[] tmpCol in indexOfEachCol)
             {
-                arrayToFill[arrIndex++] = temp[indexToFetch];
+                arrayToFill[index++] = tmpCol[indexToFetch];
             }
         }
 
-        //reads the file an prepare our matrix data 
+        //Reads the file an prepare our matrix data 
         public void prepare(String @filePath, int percentage)
         {
             Console.WriteLine(System.IO.File.Exists(filePath) ? "File exists." : "File does not exist.");
@@ -115,8 +116,8 @@ namespace AI_3d_Assingment
 
         }
 
-        //with this function I remove the col with a spesific attr name
-        public Data split(string attrName, int value)//outlook , sunny
+        //Keep only these rows that have a specific value in the given attrName
+        public Data split(string attrName, int value)
         {
             Data dataReturn = new Data();
             List<int[]> rowsReturn = new List<int[]>();

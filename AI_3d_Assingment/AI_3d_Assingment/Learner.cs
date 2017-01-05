@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+/// <summary>
+/// 3130160 Nikolaos Papadogoulas
+/// 3130198 Archontellis-Rafael Sotirchellis
+/// </summary>
 
 namespace AI_3d_Assingment
 {
@@ -18,49 +20,49 @@ namespace AI_3d_Assingment
         }
 
         // lets start learning and create the root node 
-        public Node start()
+        public Node Start()
         {
             if (filename == null)
             {
-                Console.WriteLine("the file name is null");
+                Console.WriteLine("The file name is null");
             }
             if (percentage < 0 && percentage > 100)
             {
-                Console.WriteLine("incorect percentage");
+                Console.WriteLine("Incorect percentage");
             }
 
             Data data = new Data();
-            data.prepare(filename, percentage); // Data prepare method
+            data.prepare(filename, percentage);
 
-            Dictionary<string, int[]> setTrainingVector = new Dictionary<string, int[]>();
+            Dictionary<string, int[]> TrainingDictionary = new Dictionary<string, int[]>();
 
             //fill the setTrainingVector with the data 
             for (int i = 0; i < data.cols - 1; i++)
             {
                 int[] trainingVector = new int[data.rowsNum];
-                data.fillArray(trainingVector, i);
-                setTrainingVector.Add(data.Attrs[i], trainingVector);//key,value
+                data.fillCol(trainingVector, i);
+                TrainingDictionary.Add(data.Attrs[i], trainingVector);//key,value
             }
 
             int[] finalClass = new int[data.rowsNum];
-            data.fillArray(finalClass, data.cols - 1);  //all perfect until here 
+            data.fillCol(finalClass, data.cols - 1);  //all perfect until here 
 
             Node rootNode = new Node();
             rootNode.valueOfPrevNode = -1; //this happens because there is not prev node
 
-            learnTree(setTrainingVector, finalClass, rootNode, data); //here we call the learnTree
+            LearnAndCreateTree(TrainingDictionary, finalClass, rootNode, data); //here we call the learnTree
             return rootNode;
         }
 
-        //Generates a decision tree recursively
-        public void learnTree(Dictionary<string, int[]> TrainingDictionary, int[] finalClass, Node node, Data data)
+        //this funcion generates a decision tree recursively
+        public void LearnAndCreateTree(Dictionary<string, int[]> TrainingDictionary, int[] finalClass, Node node, Data data)
         {
-            if (checkFinalClass(finalClass, 0))//check if all values are 0
+            if (ValidateFinalClass(finalClass, 0))//check if all values are 0
             {
                 node.result = 0;
                 return;
             }
-            else if (checkFinalClass(finalClass, 1))//check if all values are 0
+            else if (ValidateFinalClass(finalClass, 1))//check if all values are 0
             {
                 node.result = 1;
                 return;
@@ -84,7 +86,7 @@ namespace AI_3d_Assingment
             }
             else
             {
-                Dictionary<String, Double> attributesGains = new Dictionary<String, Double>();
+                Dictionary<String, Double> attrsGains = new Dictionary<String, Double>();
                 Dictionary<String, List<int>> mapAttributesValuesInListUnique = new Dictionary<String, List<int>>();
 
                 double entropy = getEntropy(finalClass);// initial entropy
@@ -98,15 +100,16 @@ namespace AI_3d_Assingment
 
                     int[] trainingClass = (int[])pair.Value;//key value pair -> value in trainingClass
 
-                    for (int i = 0; i < trainingClass.Length; i++) // find individual entropies
+                    for (int i = 0; i < trainingClass.Length; i++) // find entropies
                     {
-                        addOnlyUnique(atrUnique, trainingClass[i]);  // addOnlyUnique adds a value to the arraylist only if does not exists in the list
+
+                        if (!atrUnique.Contains(trainingClass[i]))
+                            atrUnique.Add(trainingClass[i]);
 
                         if (finalClass[i] == 0)// its a positive
                         {
                             if (atrPositive.ContainsKey(trainingClass[i]))
                             {
-                                //atrPositive.Add(trainingClass[i], atrPositive[trainingClass[i]] + 1); //the key already exists so cracks
                                 atrPositive[trainingClass[i]]++;   //increase the value by 1 (we love .net <3)
                             }
                             else
@@ -118,7 +121,6 @@ namespace AI_3d_Assingment
                         {
                             if (atrNegative.ContainsKey(trainingClass[i]))
                             {
-                                //atrNegative.Add(trainingClass[i], atrNegative[trainingClass[i]] + 1); // not fucking sure
                                 atrNegative[trainingClass[i]]++; //increase the value by 1
                             }
                             else
@@ -129,7 +131,6 @@ namespace AI_3d_Assingment
                         }
 
                     }
-                    //edw paizei na einai malakia !! san na bainoun dyo kleidia !!!
                     mapAttributesValuesInListUnique.Add((String)pair.Key, atrUnique);
 
                     {//calculate the gain
@@ -157,7 +158,7 @@ namespace AI_3d_Assingment
                             gain = gain - ((((double)positives + negatives) / trainingClass.Length) * entropyTemp);
                         }
 
-                        attributesGains.Add((String)pair.Key, gain);
+                        attrsGains.Add((String)pair.Key, gain);
                     }
                 }//end foreach
 
@@ -168,7 +169,7 @@ namespace AI_3d_Assingment
 
                 foreach (KeyValuePair<string, int[]> entry in TrainingDictionary)
                 {
-                    double tempGain = attributesGains[(String)entry.Key];
+                    double tempGain = attrsGains[(String)entry.Key];
                     if (indexToChoose == 0)
                     {
                         maxGainValue = tempGain;
@@ -212,14 +213,14 @@ namespace AI_3d_Assingment
                     for (int i = 0; i < childData.cols - 1; i++)
                     {
                         int[] trainingVectorChild = new int[childData.rowsNum];
-                        childData.fillArray(trainingVectorChild, i);
+                        childData.fillCol(trainingVectorChild, i);
                         childTrainingDictionary.Add(childData.Attrs[i], trainingVectorChild);
                     }
 
-                    int[] FinalClassChild = new int[childData.rowsNum];
-                    childData.fillArray(FinalClassChild, childData.cols - 1);//last column is the result
+                    int[] FinalClassOfChild = new int[childData.rowsNum];
+                    childData.fillCol(FinalClassOfChild, childData.cols - 1);//last column is the result
 
-                    learnTree(childTrainingDictionary, FinalClassChild, NodeChild, childData); //recurse
+                    LearnAndCreateTree(childTrainingDictionary, FinalClassOfChild, NodeChild, childData); //recurse
 
                 }
 
@@ -228,16 +229,8 @@ namespace AI_3d_Assingment
             }//end else
         }
 
-        //Log base 2 , need this for entropy 
-        public static double log2(double num)
-        {
-            if (num <= 0)
-                return 0.0;
-            return (Math.Log(num) / Math.Log(2));
-        }
-
         // If all the attributes in final class equals valueToChecked returns True
-        public bool checkFinalClass(int[] finalClass, int valueToChecked)
+        public bool ValidateFinalClass(int[] finalClass, int valueToChecked)
         {
             for (int i = 0; i < finalClass.Length; i++)
             {
@@ -247,9 +240,9 @@ namespace AI_3d_Assingment
             return true;
         }
         
-        //this function is used when we cant calculate a pure result but we are in a leaf node
-        //returns 0 or 1
-        //i have to make it more clever but I need sleep (5/1/2017  4.50 am)
+        //This function is used when we cant calculate a pure result but we are in a leaf node
+        //Returns 0 or 1
+        //I have to make it more clever but I need sleep (5/1/2017  4.50 am)
         public int calcResultInCaseOfTerminalAndNotPure(int[] finalClass)
         {
             int sum0 = 0,  sum1 = 0;
@@ -302,11 +295,13 @@ namespace AI_3d_Assingment
             return entropy;
         }
 
-        // Adds a value to the arraylist only if does not exists in the list
-        public void addOnlyUnique(List<int> data, int val)
+        //Log base 2 , need this for entropy 
+        public static double log2(double num)
         {
-            if (!data.Contains(val))
-                data.Add(val);
+            if (num <= 0)
+                return 0.0;
+            return (Math.Log(num) / Math.Log(2));
         }
+
     }
 }

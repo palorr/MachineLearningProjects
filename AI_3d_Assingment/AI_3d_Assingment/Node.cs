@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+/// <summary>
+/// 3130160 Nikolaos Papadogoulas
+/// 3130198 Archontellis-Rafael Sotirchellis
+/// </summary>
 
 namespace AI_3d_Assingment
 {
@@ -11,10 +13,10 @@ namespace AI_3d_Assingment
         public int valueOfPrevNode { get; set; }
         public string attrName { get; set; }
         public List<Node> children { get; set; }
-        public int result { get; set; }   // the result attribute value (-1 if not leaf node)
+        public int result { get; set; }   // the result attribute  (-1 if not leaf node, 0 , 1)
         public double gain { get; set; }
 
-        //ctor default
+        //ctor
         public Node()
         {
             children = new List<Node>();

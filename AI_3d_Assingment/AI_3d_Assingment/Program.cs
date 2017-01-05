@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+/// <summary>
+/// 3130160 Nikolaos Papadogoulas
+/// 3130198 Archontellis-Rafael Sotirchellis
+/// </summary>
 
 namespace AI_3d_Assingment
 {
@@ -18,7 +20,7 @@ namespace AI_3d_Assingment
             string trainText = System.IO.File.ReadAllText(trainFilePath);
 
             Learner learner = new Learner(trainFilePath, percentToLearnFromTrain);
-            Node root = learner.start();
+            Node root = learner.Start();
 
             Console.WriteLine("Ok the app has learned by the file!!");
             Console.WriteLine("Now for each attribute give the value (0 or 1 if you use the default train file train.dat)");
@@ -44,7 +46,6 @@ namespace AI_3d_Assingment
             Console.WriteLine("attr6: ");
             int attr6 = Int32.Parse(Console.ReadLine());
 
-
             testRow.Add("attr1", attr1);
             testRow.Add("attr2", attr2);
             testRow.Add("attr3", attr3);
@@ -54,6 +55,7 @@ namespace AI_3d_Assingment
 
             Console.WriteLine("The result is: "+ root.ScanAndCalculate(testRow, root));
 
+            Console.ReadLine();
         }
     }
 }
