@@ -45,7 +45,7 @@ namespace AI_3d_Assingment
             }
 
             int[] finalClass = new int[data.rowsNum];
-            data.fillCol(finalClass, data.cols - 1);  //all perfect until here 
+            data.fillCol(finalClass, data.cols - 1);  
 
             Node rootNode = new Node();
             rootNode.valueOfPrevNode = -1; //this happens because there is not prev node
@@ -110,7 +110,7 @@ namespace AI_3d_Assingment
                         {
                             if (atrPositive.ContainsKey(trainingClass[i]))
                             {
-                                atrPositive[trainingClass[i]]++;   //increase the value by 1 (we love .net <3)
+                                atrPositive[trainingClass[i]]++;   //increase the value by 1
                             }
                             else
                             {
@@ -189,10 +189,10 @@ namespace AI_3d_Assingment
                 //for each value of each attribute
                 List<int> atrUniqueValuesForAttrMaxGain = mapAttributesValuesInListUnique[attributeWithMAxGain];
 
-                foreach (int tempAtrUniqueValue in atrUniqueValuesForAttrMaxGain)
+                foreach (int attrUniqueValue in atrUniqueValuesForAttrMaxGain)
                 {
                     //split tha data 
-                    Data childData = data.split(attributeWithMAxGain, tempAtrUniqueValue);
+                    Data childData = data.split(attributeWithMAxGain, attrUniqueValue);
                     
                     /////////////////////////////////////////
                     //with this check I avoid the infinity loop in case of non-pure final data
@@ -204,7 +204,7 @@ namespace AI_3d_Assingment
                     /////////////////////////////////////////
 
                     Node NodeChild = new Node();
-                    NodeChild.valueOfPrevNode = tempAtrUniqueValue;// since its a child
+                    NodeChild.valueOfPrevNode = attrUniqueValue;// since its a child
                                                              
                     node.children.Add(NodeChild);
 
@@ -272,7 +272,7 @@ namespace AI_3d_Assingment
             return countPos;
         }
 
-        // Returns entropy calculated for a given set of vector
+        // Calculates the entropy
         public double getEntropy(int[] array)
         {
             double entropy = 0.0;
